@@ -1,13 +1,6 @@
 package com.example.project;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
-
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -15,20 +8,26 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -51,6 +50,8 @@ public class MapsActivity extends FragmentActivity implements
     private Location lastLocation;
     private Marker currentUserLocationMarker;
     private static final int Request_User_Location_Code = 99;
+    private double latitude, longitude;
+    private int ProximityRadius = 10000;
 
 
 
@@ -74,6 +75,12 @@ public class MapsActivity extends FragmentActivity implements
 
 
     public void onClick(View v){
+
+        String hospital = "hospital", school = "school", restaurant = "restaurant";
+        Object transferData[] = new Object[2];
+        GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
+
+
 
         switch (v.getId())
         {
@@ -126,8 +133,52 @@ public class MapsActivity extends FragmentActivity implements
                 }
                 break;
 
+            case R.id.hospitals_nearby:
+                mMap.clear();
+                String url = getUrl(latitude, longitude, hospital);
+                transferData[0] = mMap;
+                transferData[1] = url;
+
+                getNearbyPlaces.execute(transferData);
+                Toast.makeText(this, "Searching for Nearby Hospitals..", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Showing for Nearby Hospitals..", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.schools_nearby:
+                mMap.clear();
+                String url2 = getUrl(latitude, longitude, school);
+                transferData[0] = mMap;
+                transferData[1] = url2;
+
+                getNearbyPlaces.execute(transferData);
+                Toast.makeText(this, "Searching for Nearby schools..", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Showing for Nearby schools..", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.restaurants_nearby:
+                mMap.clear();
+                String url3 = getUrl(latitude, longitude, restaurant);
+                transferData[0] = mMap;
+                transferData[1] = url3;
+
+                getNearbyPlaces.execute(transferData);
+                Toast.makeText(this, "Searching for Nearby restaurants..", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Showing for Nearby restaurants..", Toast.LENGTH_SHORT).show();
+                break;
         }
 
+
+
+    }
+
+    private String getUrl(double latitude, double longitude, String nearbyPlace)
+    {
+        StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=Museum%20of%20Contemporary%20Art%20Australia&inputtype=textquery&fields=photos,formatted_address,name,rating,opening_hours,geometry&key=AIzaSyAy780b4xZUSu1lnTVrUA1xA2sGLoT6A-g");
+
+
+        Log.d("GoogleMapsActivity", "url = " + googleURL.toString());
+
+        return googleURL.toString();
 
 
     }
@@ -211,7 +262,12 @@ public class MapsActivity extends FragmentActivity implements
 
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(Location location)
+    {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+
+
         lastLocation = location;
 
         if(currentUserLocationMarker != null)
