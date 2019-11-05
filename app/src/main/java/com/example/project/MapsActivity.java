@@ -173,8 +173,12 @@ public class MapsActivity extends FragmentActivity implements
 
     private String getUrl(double latitude, double longitude, String nearbyPlace)
     {
-        StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=Museum%20of%20Contemporary%20Art%20Australia&inputtype=textquery&fields=photos,formatted_address,name,rating,opening_hours,geometry&key=AIzaSyAy780b4xZUSu1lnTVrUA1xA2sGLoT6A-g");
-
+        StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?");
+        googleURL.append("location" + latitude + "," + longitude);
+        googleURL.append("&radius=" + ProximityRadius);
+        googleURL.append("&type=" + nearbyPlace);
+        googleURL.append("&sensor=true");
+        googleURL.append("&key=" + "AIzaSyAy780b4xZUSu1lnTVrUA1xA2sGLoT6A-g");
 
         Log.d("GoogleMapsActivity", "url = " + googleURL.toString());
 
