@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by Coding Cafe on 7/18/2018.
- */
 
 public class DataParser
 {
@@ -19,9 +16,9 @@ public class DataParser
         HashMap<String, String> googlePlaceMap = new HashMap<>();
         String NameOfPlace = "-NA-";
         String vicinity = "-NA-";
-        String latitude = "";
-        String longitude = "";
-        String reference = "";
+        String latitude = " ";
+        String longitude = " ";
+        String reference = " ";
 
         try
         {
@@ -55,7 +52,17 @@ public class DataParser
 
     private List<HashMap<String, String>> getAllNearbyPlaces(JSONArray jsonArray)
     {
-        int counter = jsonArray.length();
+
+   /*         int counter;
+        if (jsonArray != null) {
+            counter = jsonArray.length();
+        }
+        else {
+            counter = 0;
+        }
+*/
+   int counter =jsonArray.length();
+
 
         List<HashMap<String, String>> NearbyPlacesList = new ArrayList<>();
 

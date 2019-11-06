@@ -140,8 +140,8 @@ public class MapsActivity extends FragmentActivity implements
                 transferData[1] = url;
 
                 getNearbyPlaces.execute(transferData);
-                Toast.makeText(this, "Searching for Nearby Hospitals..", Toast.LENGTH_SHORT).show();
-                Toast.makeText(this, "Showing for Nearby Hospitals..", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Searching for Nearby Hospitals...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Showing Nearby Hospitals...", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.schools_nearby:
@@ -173,8 +173,8 @@ public class MapsActivity extends FragmentActivity implements
 
     private String getUrl(double latitude, double longitude, String nearbyPlace)
     {
-        StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?");
-        googleURL.append("location" + latitude + "," + longitude);
+        StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+        googleURL.append("location=" + latitude + "," + longitude);
         googleURL.append("&radius=" + ProximityRadius);
         googleURL.append("&type=" + nearbyPlace);
         googleURL.append("&sensor=true");
