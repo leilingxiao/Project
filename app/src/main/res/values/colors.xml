@@ -8,6 +8,8 @@
     <color name="color_preloader_start">#fdb6b6</color>
     <color name="color_preloader_center">#fdb6b6</color>
     <color name="color_preloader_end">#ffffff</color>
+    <color name="Black">#000 </color>
+    <color name="linkBlue">#4d94ff</color>
 
 
 </resources>

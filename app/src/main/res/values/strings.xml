@@ -11,4 +11,9 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="already_registered">Already Registered?</string>
     <string name="welcome_user">Welcome User</string>
+    <string name="email_registration">Email Registration</string>
+    <string name="prompt_email">Email</string>
+    <string name="sign_in">Sign In</string>
+    <string name="collection_users">Users</string>
+
 </resources>
