@@ -82,7 +82,7 @@ public class User implements Parcelable{
                 "email='" + email + '\'' +
                 ", user_id='" + user_id + '\'' +
                 ", username='" + username + '\'' +
-                ", avatar='" + avatar + '\'' +
+
                 '}';
     }
 
