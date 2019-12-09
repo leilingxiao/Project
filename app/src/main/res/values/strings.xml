@@ -15,5 +15,7 @@
     <string name="prompt_email">Email</string>
     <string name="sign_in">Sign In</string>
     <string name="collection_users">Users</string>
+    <string name="email">Email</string>
+    <string name="collection_user_locations">User Locations</string>
 
 </resources>

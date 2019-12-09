@@ -1,11 +1,11 @@
 package com.example.project;
 
-import android.app.Application;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.project.models.User;
 
 
-public class UserClient extends Application {
+public class UserClient extends AppCompatActivity {
 
 
     private User user = null;

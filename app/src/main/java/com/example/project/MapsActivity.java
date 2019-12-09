@@ -19,8 +19,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.project.models.User;
+import com.example.project.models.UserLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -32,6 +35,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,6 +62,10 @@ public class MapsActivity extends AppCompatActivity implements
     private static final int Request_User_Location_Code = 99;
     private double latitude, longitude;
     private int ProximityRadius = 10000;
+    private UserLocation mUserLocation;
+    private FirebaseFirestore mDb;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private static final String TAG = "MapsActivity";
 
 
 
@@ -60,10 +74,15 @@ public class MapsActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
             checkUserLocationPermission();
         }
+
+        mDb = FirebaseFirestore.getInstance();
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -73,12 +92,79 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
 
+    private void getUserDetails(){
+        if(mUserLocation == null){
+            mUserLocation = new UserLocation();
+            DocumentReference userRef = mDb.collection("Users")
+                    .document(FirebaseAuth.getInstance().getUid());
+
+            userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if(task.isSuccessful()){
+                        Log.d(TAG, "onComplete: successfully set the user client.");
+                        User user = task.getResult().toObject(User.class);
+                        mUserLocation.setUser(user);
+                        getLastKnownLocation();
+                    }
+                }
+            });
+        }
+        else{
+            getLastKnownLocation();
+        }
+    }
+
+    private void getLastKnownLocation() {
+        Log.d(TAG, "getLastKnownLocation: called.");
+
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<android.location.Location>() {
+            @Override
+            public void onComplete(@NonNull Task<android.location.Location> task) {
+                if (task.isSuccessful()) {
+                    Location location = task.getResult();
+                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                    mUserLocation.setGeo_point(geoPoint);
+                    mUserLocation.setTimestamp(null);
+                    saveUserLocation();
+                }
+            }
+        });
+
+    }
+
+    private void saveUserLocation(){
+
+        if(mUserLocation != null){
+            DocumentReference locationRef = mDb
+                    .collection("User Location")
+                    .document(FirebaseAuth.getInstance().getUid());
+
+            locationRef.set(mUserLocation).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        Log.d(TAG, "saveUserLocation: \ninserted user location into database." +
+                                "\n latitude: " + mUserLocation.getGeo_point().getLatitude() +
+                                "\n longitude: " + mUserLocation.getGeo_point().getLongitude());
+                    }
+                }
+            });
+        }
+    }
+
+
 
     public void onClick(View v){
 
         String hospital = "hospital", school = "school", restaurant = "restaurant";
         Object transferData[] = new Object[2];
         GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
+        getUserDetails();
 
 
 
@@ -310,6 +396,7 @@ public class MapsActivity extends AppCompatActivity implements
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+
         }
 
 
